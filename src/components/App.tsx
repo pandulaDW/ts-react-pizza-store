@@ -6,6 +6,7 @@ import AppCSS from "../styles/App.module.css";
 import PizzaSVG from "../svg/pizza.svg";
 import Cart from "./Cart";
 import SpecialOffer from "./SpecialOffer";
+import AddToCartRP from "./AddToCartRP";
 
 const App = () => {
   const specialOfferPizza = pizzas.find((pizza) => pizza.specialOffer);
