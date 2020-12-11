@@ -1,5 +1,4 @@
-import React, { useReducer, createContext } from "react";
-import { useContext } from "react";
+import React, { useReducer, useEffect, useContext, createContext } from "react";
 
 interface CartItem {
   id: number;
@@ -35,7 +34,16 @@ interface AddToCartAction extends Action<"ADD_TO_CART"> {
   };
 }
 
-const reducer = (state: AppStateValue, action: AddToCartAction) => {
+interface InitializeCartAction extends Action<"INITIALIZE_CART"> {
+  payload: {
+    cart: AppStateValue["cart"];
+  };
+}
+
+const reducer = (
+  state: AppStateValue,
+  action: AddToCartAction | InitializeCartAction
+) => {
   switch (action.type) {
     case "ADD_TO_CART":
       const itemToAdd = action.payload.item;
@@ -56,6 +64,8 @@ const reducer = (state: AppStateValue, action: AddToCartAction) => {
             : [...state.cart.items, { ...itemToAdd, quantity: 1 }],
         },
       };
+    case "INITIALIZE_CART":
+      return { ...state, cart: action.payload.cart };
     default:
       return state;
   }
@@ -73,6 +83,23 @@ export const useStateDispatch = () => {
 
 const AppStateProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, defaultStateValue);
+
+  // get cart from localstorage at initial render
+  useEffect(() => {
+    const cart = localStorage.getItem("cart");
+    if (cart) {
+      dispatch({
+        type: "INITIALIZE_CART",
+        payload: { cart: JSON.parse(cart) },
+      });
+    }
+  }, []);
+
+  // save cart to localstorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(state.cart));
+  }, [state.cart]);
+
   return (
     <AppStateContext.Provider value={state}>
       <AppDispatchContext.Provider value={dispatch}>
