@@ -10,6 +10,13 @@ import SpecialOffer from "./SpecialOffer";
 const App = () => {
   const specialOfferPizza = pizzas.find((pizza) => pizza.specialOffer);
 
+  // This is how to add document event listeres in functional componenets
+  React.useEffect(() => {
+    const listener = () => alert("hello");
+    document.addEventListener("mousedown", listener);
+    return () => document.removeEventListener("mousedown", listener);
+  }, []);
+
   return (
     <AppStateProvider>
       <div className={AppCSS.container}>

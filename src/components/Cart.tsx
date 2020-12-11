@@ -9,16 +9,35 @@ interface State {
 }
 
 class Cart extends React.Component<Props, State> {
+  private containerRef: React.RefObject<HTMLDivElement>;
   constructor(props: Props) {
     super(props);
     this.state = {
       isOpen: false,
     };
     this.handleClick = this.handleClick.bind(this);
+    this.containerRef = React.createRef();
   }
 
   handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     this.setState({ isOpen: !this.state.isOpen });
+  }
+
+  handleOutsideClick = (el: MouseEvent) => {
+    if (
+      this.containerRef.current &&
+      !this.containerRef.current.contains(el.target as Node)
+    )
+      this.setState({ isOpen: false });
+  };
+
+  componentDidMount() {
+    document.addEventListener("mousedown", this.handleOutsideClick);
+  }
+
+  // cleaning up
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleOutsideClick);
   }
 
   render() {
@@ -30,7 +49,7 @@ class Cart extends React.Component<Props, State> {
             0
           );
           return (
-            <div className={CartCSS.cartContainer}>
+            <div className={CartCSS.cartContainer} ref={this.containerRef}>
               <button
                 className={CartCSS.button}
                 type="button"
